@@ -1,6 +1,7 @@
 import { isEqual } from 'date-fns';
 import Appointment from '../models/Appointment';
 
+// Criar, deletar, modificar infos (CRUD) fica no repositórios, realiza as operações em cima dos dados armazenados
 // DTO - Data Transfer Object
 
 interface CreateAppointmentDTO {
@@ -8,7 +9,7 @@ interface CreateAppointmentDTO {
     date: Date;
 }
 
-class AppointmentRepository {
+class AppointmentsRepository {
     private appointments: Appointment[];
 
     constructor() {
@@ -36,4 +37,4 @@ class AppointmentRepository {
     }
 }
 
-export default AppointmentRepository;
+export default AppointmentsRepository;

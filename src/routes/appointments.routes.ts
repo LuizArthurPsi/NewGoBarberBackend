@@ -1,11 +1,12 @@
-// Criar, deletar, modificar infos (CRUD) fica no repositórios, realiza as operações em cima dos dados armazenados
+// Rota: Receber requisição, chamar outro arquivo, devolver uma resposta
 
-import { request, Router } from 'express';
-import { startOfHour, parseISO } from 'date-fns';
-import AppointmentRepository from '../repositories/AppointmentRepository';
+import { Router } from 'express';
+import { parseISO } from 'date-fns';
+import AppointmentsRepository from '../repositories/AppointmentsRepository';
+import CreateAppointmentService from '../services/CreateAppointmentService';
 
 const appointmentsRouter = Router();
-const appointmentsRepository = new AppointmentRepository();
+const appointmentsRepository = new AppointmentsRepository();
 
 appointmentsRouter.get('/', (request, response) => {
     const appointments = appointmentsRepository.all();
@@ -14,25 +15,24 @@ appointmentsRouter.get('/', (request, response) => {
 });
 
 appointmentsRouter.post('/', (request, response) => {
-    const { provider, date } = request.body;
+    try {
+        const { provider, date } = request.body;
 
-    const parsedDate = startOfHour(parseISO(date));
+        const parsedDate = parseISO(date);
 
-    const findAppointmentInSameDate =
-        appointmentsRepository.findByDate(parsedDate);
+        const createAppointment = new CreateAppointmentService(
+            appointmentsRepository,
+        );
 
-    if (findAppointmentInSameDate) {
-        return response
-            .status(400)
-            .json({ message: 'This appointment is already booked ' });
+        const appointment = createAppointment.execute({
+            date: parsedDate,
+            provider,
+        });
+
+        return response.json(appointment);
+    } catch (err) {
+        return response.status(400).json({ error: err.message });
     }
-
-    const appointment = appointmentsRepository.create({
-        provider,
-        date: parsedDate,
-    });
-
-    return response.json(appointment);
 });
 
 export default appointmentsRouter;

@@ -1,4 +1,4 @@
-// formata os dados
+// formata os dados, representa como um dado é composto na app
 
 import { uuid } from 'uuidv4';
 
